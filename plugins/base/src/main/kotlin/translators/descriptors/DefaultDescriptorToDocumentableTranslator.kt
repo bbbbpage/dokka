@@ -48,7 +48,7 @@ class DefaultDescriptorToDocumentableTranslator(
                 DRIWithPlatformInfo(DRI.topLevel, PlatformDependent.empty())
             )
         }
-    }.let { DModule(moduleName, it, PlatformDependent.empty(), listOf(platformData)) }
+    }.let { DPass(moduleName, it, PlatformDependent.empty(), listOf(platformData)) }
 
 }
 

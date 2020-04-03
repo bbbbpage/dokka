@@ -9,25 +9,22 @@ import org.jetbrains.kotlin.utils.addToStdlib.firstNotNullResult
 
 internal object DefaultDocumentableMerger : DocumentableMerger {
 
-    override fun invoke(modules: Collection<DModule>, context: DokkaContext): DModule {
+    override fun invoke(passes: Collection<DPass>, context: DokkaContext): DModuleView {
 
         val projectName =
-            modules.fold(modules.first().name) { acc, module -> acc.commonPrefixWith(module.name) }
+            passes.fold(passes.first().name) { acc, module -> acc.commonPrefixWith(module.name) }
                 .takeIf { it.isNotEmpty() }
                 ?: "project"
 
-        return modules.reduce { left, right ->
-            val list = listOf(left, right)
-            DModule(
-                name = projectName,
-                packages = merge(
-                    list.flatMap { it.packages },
-                    DPackage::mergeWith
-                ),
-                documentation = list.platformDependentFor { documentation },
-                platformData = list.flatMap { it.platformData }.distinct()
-            ).mergeExtras(left, right)
-        }
+        return DModule(
+            name = projectName,
+            packages = merge(
+                passes.flatMap { it.packages },
+                DPackage::mergeWith
+            ),
+            documentation = passes.platformDependentFor { documentation },
+            platformData = passes.flatMap { it.platformData }.distinct()
+        ).mergeExtras(passes)
     }
 }
 

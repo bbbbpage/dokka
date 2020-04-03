@@ -121,18 +121,38 @@ interface Callable : WithVisibility, WithType, WithAbstraction, WithExpectActual
 
 abstract class DClasslike : Documentable(), WithScope, WithVisibility, WithExpectActual
 
-data class DModule(
+sealed class DModuleView(
     override val name: String,
-    val packages: List<DPackage>,
+    open val packages: List<DPackage>,
     override val documentation: PlatformDependent<DocumentationNode>,
     override val platformData: List<PlatformData>,
-    override val extra: PropertyContainer<DModule> = PropertyContainer.empty()
-) : Documentable(), WithExtraProperties<DModule> {
+    override val extra: PropertyContainer<DModuleView> = PropertyContainer.empty()
+) : Documentable(), WithExtraProperties<DModuleView> {
     override val dri: DRI = DRI.topLevel
     override val children: List<Documentable>
         get() = packages
+}
 
-    override fun withNewExtras(newExtras: PropertyContainer<DModule>) = copy(extra = newExtras)
+data class DModule(
+    override val name: String,
+    override val packages: List<DPackage>,
+    override val documentation: PlatformDependent<DocumentationNode>,
+    override val platformData: List<PlatformData>,
+    override val extra: PropertyContainer<DModuleView> = PropertyContainer.empty()
+) : DModuleView(name, packages, documentation, platformData, extra) {
+    override fun withNewExtras(newExtras: PropertyContainer<DModuleView>): DModuleView  = copy(extra = newExtras)
+}
+
+data class DPass(
+    override val name: String,
+    override val packages: List<DPackage>,
+    override val documentation: PlatformDependent<DocumentationNode>,
+    override val platformData: List<PlatformData>,
+    override val extra: PropertyContainer<DModuleView> = PropertyContainer.empty()
+) : DModuleView(name, packages, documentation, platformData, extra) {
+    override fun withNewExtras(newExtras: PropertyContainer<DModuleView>): DModuleView  = copy(extra = newExtras)
+
+    fun toDModule() = DModule(name, packages, documentation, platformData, extra)
 }
 
 data class DPackage(
