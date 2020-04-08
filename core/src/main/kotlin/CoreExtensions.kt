@@ -7,6 +7,7 @@ import org.jetbrains.dokka.transformers.documentation.DocumentableMerger
 import org.jetbrains.dokka.transformers.documentation.DocumentableToPageTranslator
 import org.jetbrains.dokka.transformers.documentation.DocumentableTransformer
 import org.jetbrains.dokka.transformers.documentation.PreMergeDocumentableTransformer
+import org.jetbrains.dokka.transformers.pages.PageCreator
 import org.jetbrains.dokka.transformers.pages.PageTransformer
 import org.jetbrains.dokka.transformers.psi.PsiToDocumentableTranslator
 import kotlin.reflect.KProperty
@@ -19,6 +20,7 @@ object CoreExtensions {
     val documentableTransformer by coreExtension<DocumentableTransformer>()
     val documentableToPageTranslator by coreExtension<DocumentableToPageTranslator>()
     val pageTransformer by coreExtension<PageTransformer>()
+    val allModulePageCreator by coreExtension<PageCreator>()
     val renderer by coreExtension<Renderer>()
 
     private fun <T : Any> coreExtension() = object {

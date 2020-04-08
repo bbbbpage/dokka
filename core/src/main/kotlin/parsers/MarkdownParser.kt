@@ -23,7 +23,7 @@ import org.intellij.markdown.parser.MarkdownParser as IntellijMarkdownParser
 
 class MarkdownParser(
     private val resolutionFacade: DokkaResolutionFacade,
-    private val declarationDescriptor: DeclarationDescriptor,
+    private val declarationDescriptor: DeclarationDescriptor? = null,
     private val logger: DokkaLogger
 ) : Parser() {
 
@@ -106,15 +106,17 @@ class MarkdownParser(
                         java.net.URL(link)
                         null
                     } catch (e: MalformedURLException) {
-                        resolveKDocLink(
-                            resolutionFacade.resolveSession.bindingContext,
-                            resolutionFacade,
-                            declarationDescriptor,
-                            null,
-                            link.split('.')
-                        ).also { if (it.size > 1) logger.warn("Markdown link resolved more than one element: $it") }
-                            .firstOrNull()//.single()
-                            ?.let { DRI.from(it) }
+                        declarationDescriptor?.let {
+                            resolveKDocLink(
+                                resolutionFacade.resolveSession.bindingContext,
+                                resolutionFacade,
+                                it,
+                                null,
+                                link.split('.')
+                            ).also { if (it.size > 1) logger.warn("Markdown link resolved more than one element: $it") }
+                                .firstOrNull()//.single()
+                                ?.let { DRI.from(it) }
+                        }
                     }
                 }
 

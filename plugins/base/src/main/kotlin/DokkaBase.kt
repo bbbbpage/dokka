@@ -1,6 +1,7 @@
 package org.jetbrains.dokka.base
 
 import org.jetbrains.dokka.CoreExtensions
+import org.jetbrains.dokka.base.allModulePage.MultimodulePageCreator
 import org.jetbrains.dokka.base.renderers.FileWriter
 import org.jetbrains.dokka.base.renderers.OutputWriter
 import org.jetbrains.dokka.base.renderers.html.*
@@ -10,6 +11,7 @@ import org.jetbrains.dokka.base.signatures.SignatureProvider
 import org.jetbrains.dokka.base.resolvers.external.*
 import org.jetbrains.dokka.base.resolvers.local.DefaultLocationProviderFactory
 import org.jetbrains.dokka.base.resolvers.local.LocationProviderFactory
+import org.jetbrains.dokka.base.resolvers.local.MultimoduleLocationProviderFactory
 import org.jetbrains.dokka.base.transformers.documentables.ActualTypealiasAdder
 import org.jetbrains.dokka.base.transformers.documentables.DefaultDocumentableMerger
 import org.jetbrains.dokka.base.transformers.documentables.InheritorsExtractorTransformer
@@ -112,7 +114,7 @@ class DokkaBase : DokkaPlugin() {
     }
 
     val locationProvider by extending(isFallback = true) {
-        locationProviderFactory providing ::DefaultLocationProviderFactory
+        locationProviderFactory providing ::DefaultLocationProviderFactory applyIf { descriptors.isEmpty() }
     }
 
     val javadocLocationProvider by extending {
@@ -153,5 +155,15 @@ class DokkaBase : DokkaPlugin() {
 
     val styleAndScriptsAppender by extending {
         htmlPreprocessors with StyleAndScriptsAppender order { after(rootCreator) }
+    }
+
+    val allModulePageCreator by extending {
+        CoreExtensions.allModulePageCreator providing {
+            MultimodulePageCreator(it)
+        }
+    }
+
+    val allModuleLocationProvider by extending {
+        locationProviderFactory with MultimoduleLocationProviderFactory applyIf { descriptors.isNotEmpty() }
     }
 }

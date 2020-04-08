@@ -25,7 +25,12 @@ open class DefaultPageCreator(
     protected open val contentBuilder = PageContentBuilder(commentsToContentConverter, signatureProvider, logger)
 
     open fun pageForModule(m: DModuleView) =
-        ModulePageNode(m.name.ifEmpty { "<root>" }, contentForModule(m), m, m.packages.map(::pageForPackage))
+        m.let {
+            when(m) {
+                is DModule -> ModulePageNode(m.name.ifEmpty { "<root>" }, contentForModule(m), m, m.packages.map(::pageForPackage))
+                is DPass -> ModulePageNode(m.name.ifEmpty { "<root>" }, contentForModule(m.toDModule()), m, m.packages.map(::pageForPackage))
+            }
+        }
 
     open fun pageForPackage(p: DPackage): PackagePageNode = PackagePageNode(
         p.name, contentForPackage(p), setOf(p.dri), p,

@@ -33,6 +33,7 @@ interface DokkaConfiguration {
     val passesConfigurations: List<PassConfiguration>
     val impliedPlatforms: List<String>
     val pluginsClasspath: List<File>
+    val descriptors: List<DokkaModuleDescriptor>
 
     interface PassConfiguration {
         val moduleName: String
@@ -58,6 +59,7 @@ interface DokkaConfiguration {
         val analysisPlatform: Platform
         val targets: List<String>
         val sinceKotlin: String?
+        val documentationFile: String?
 
         val platformData: PlatformData
         get() = PlatformData(moduleName, analysisPlatform, targets)
@@ -99,4 +101,10 @@ interface DokkaConfiguration {
                     throw IllegalArgumentException("url or url && packageListUrl must not be null for external documentation link")
         }
     }
+}
+
+interface DokkaModuleDescriptor {
+    val name: String
+    val path: String
+    val docFile: String
 }

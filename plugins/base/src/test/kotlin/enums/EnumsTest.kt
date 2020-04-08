@@ -3,9 +3,10 @@ package enums
 import org.jetbrains.dokka.model.DEnum
 import org.jetbrains.dokka.pages.ClasslikePageNode
 import org.jetbrains.dokka.pages.ModulePageNode
-import org.junit.jupiter.api.Test
 import org.jetbrains.dokka.testApi.testRunner.AbstractCoreTest
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import utils.testIfInstance
 
 class EnumsTest : AbstractCoreTest() {
 
@@ -31,7 +32,7 @@ class EnumsTest : AbstractCoreTest() {
         """.trimMargin(),
             configuration
         ) {
-            pagesGenerationStage = {
+            pagesGenerationStage = testIfInstance<ModulePageNode, Unit> {
                 val map = it.getClasslikeToMemberMap()
                 val test = map.filterKeys { it.name == "Test" }.values.firstOrNull()
                 assertTrue(test != null) { "Test not found" }
@@ -63,7 +64,7 @@ class EnumsTest : AbstractCoreTest() {
         """.trimMargin(),
             configuration
         ) {
-            documentablesCreationStage = {m ->
+            documentablesCreationStage = { m ->
                 assertTrue(m.isNotEmpty(), "Module list cannot be empty")
                 m.first().packages.let { p ->
                     assertTrue(p.isNotEmpty(), "Package list cannot be empty")
@@ -77,7 +78,7 @@ class EnumsTest : AbstractCoreTest() {
                     }
                 }
             }
-            pagesGenerationStage = { module ->
+            pagesGenerationStage = testIfInstance<ModulePageNode, Unit> { module ->
                 val map = module.getClasslikeToMemberMap()
                 val test = map.filterKeys { it.name == "Test" }.values.firstOrNull()
                 assertNotNull(test, "Test not found")

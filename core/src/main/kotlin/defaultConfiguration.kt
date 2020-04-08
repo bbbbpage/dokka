@@ -10,7 +10,8 @@ data class DokkaConfigurationImpl(
     override val cacheRoot: String?,
     override val impliedPlatforms: List<String>,
     override val passesConfigurations: List<PassConfigurationImpl>,
-    override var pluginsClasspath: List<File>
+    override var pluginsClasspath: List<File>,
+    override var descriptors: List<DokkaModuleDescriptorImpl> = emptyList()
 ) : DokkaConfiguration
 
 data class PassConfigurationImpl (
@@ -36,7 +37,8 @@ data class PassConfigurationImpl (
     override val collectInheritedExtensionsFromLibraries: Boolean,
     override val analysisPlatform: Platform,
     override val targets: List<String>,
-    override val sinceKotlin: String?
+    override val sinceKotlin: String?,
+    override val documentationFile: String?
 ) : DokkaConfiguration.PassConfiguration
 
 
@@ -72,3 +74,9 @@ data class PackageOptionsImpl(
 data class ExternalDocumentationLinkImpl(override val url: URL,
                                          override val packageListUrl: URL
 ) : DokkaConfiguration.ExternalDocumentationLink
+
+data class DokkaModuleDescriptorImpl(
+    override val name: String,
+    override val path: String,
+    override val docFile: String
+) : DokkaModuleDescriptor

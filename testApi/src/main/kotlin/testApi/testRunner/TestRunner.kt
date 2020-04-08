@@ -110,7 +110,7 @@ abstract class AbstractCoreTest {
         var documentablesFirstTransformationStep: (List<DModuleView>) -> Unit = {}
         var documentablesMergingStage: (DModuleView) -> Unit = {}
         var documentablesTransformationStage: (DModuleView) -> Unit = {}
-        var pagesGenerationStage: (ModulePageNode) -> Unit = {}
+        var pagesGenerationStage: (RootPageNode) -> Unit = {}
         var pagesTransformationStage: (RootPageNode) -> Unit = {}
         var renderingStage: (RootPageNode, DokkaContext) -> Unit = { a, b -> }
 
@@ -211,7 +211,8 @@ abstract class AbstractCoreTest {
             sinceKotlin = sinceKotlin,
             perPackageOptions = perPackageOptions,
             externalDocumentationLinks = externalDocumentationLinks,
-            sourceLinks = sourceLinks
+            sourceLinks = sourceLinks,
+            documentationFile = null
         )
     }
 
@@ -239,7 +240,7 @@ data class TestMethods(
     val documentablesFirstTransformationStep: (List<DModuleView>) -> Unit,
     val documentablesMergingStage: (DModuleView) -> Unit,
     val documentablesTransformationStage: (DModuleView) -> Unit,
-    val pagesGenerationStage: (ModulePageNode) -> Unit,
+    val pagesGenerationStage: (RootPageNode) -> Unit,
     val pagesTransformationStage: (RootPageNode) -> Unit,
     val renderingStage: (RootPageNode, DokkaContext) -> Unit
 )

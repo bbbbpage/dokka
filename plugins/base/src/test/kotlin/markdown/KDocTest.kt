@@ -5,6 +5,7 @@ import org.jetbrains.dokka.model.doc.DocumentationNode
 import org.jetbrains.dokka.pages.ModulePageNode
 import org.junit.jupiter.api.Assertions.*
 import org.jetbrains.dokka.testApi.testRunner.AbstractCoreTest
+import utils.testIfInstance
 
 abstract class KDocTest : AbstractCoreTest() {
 
@@ -36,7 +37,7 @@ abstract class KDocTest : AbstractCoreTest() {
             interpolateKdoc(kdoc),
             configuration
         ) {
-            pagesGenerationStage = {
+            pagesGenerationStage = testIfInstance<ModulePageNode, Unit> {
                 assertEquals(
                     expectedDocumentationNode,
                     actualDocumentationNode(it)

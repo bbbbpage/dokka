@@ -63,6 +63,20 @@ class DokkaGenerator(
         logger.report()
     }.dump("\n\n === TIME MEASUREMENT ===\n")
 
+    fun generateAllModulesPage() = timed {
+        report("Setting up analysis environments")
+        val platforms: Map<PlatformData, EnvironmentAndFacade> = setUpAnalysis(configuration)
+
+        report("Initializing plugins")
+        val context = initializePlugins(configuration, logger, platforms)
+
+        val allModulePageCreator = context[CoreExtensions.allModulePageCreator].first()
+        val allModulePage = allModulePageCreator.create(context.configuration.descriptors)
+
+        report("Rendering")
+        render(allModulePage, context)
+    }.dump("\n\n === TIME MEASUREMENT ===\n")
+
     fun setUpAnalysis(configuration: DokkaConfiguration): Map<PlatformData, EnvironmentAndFacade> =
         configuration.passesConfigurations.map {
             it.platformData to createEnvironmentAndFacade(it)
@@ -189,7 +203,7 @@ class EnvironmentAndFacade(val environment: KotlinCoreEnvironment, val facade: D
     operator fun component2() = facade
 }
 
-private class Timer(startTime: Long, private val logger: DokkaLogger?) {
+class Timer(startTime: Long, private val logger: DokkaLogger?) {
     private val steps = mutableListOf("" to startTime)
 
     fun report(name: String) {
@@ -209,5 +223,5 @@ private class Timer(startTime: Long, private val logger: DokkaLogger?) {
     }
 }
 
-private fun timed(logger: DokkaLogger? = null, block: Timer.() -> Unit): Timer =
+fun timed(logger: DokkaLogger? = null, block: Timer.() -> Unit): Timer =
     Timer(System.currentTimeMillis(), logger).apply(block).apply { report("") }

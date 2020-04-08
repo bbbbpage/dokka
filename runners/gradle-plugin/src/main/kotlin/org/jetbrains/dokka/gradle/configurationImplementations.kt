@@ -7,6 +7,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.util.ConfigureUtil
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.DokkaConfiguration.*
+import org.jetbrains.dokka.DokkaModuleDescriptor
 import org.jetbrains.dokka.Platform
 import java.io.File
 import java.io.Serializable
@@ -25,33 +26,34 @@ class GradleSourceRootImpl: SourceRoot, Serializable {
 }
 
 open class GradlePassConfigurationImpl(@Transient val name: String = ""): PassConfiguration {
-    @Input @Optional override var classpath: List<String> = emptyList()
-    @Input override var moduleName: String = ""
-    @Input override var sourceRoots: MutableList<SourceRoot> = mutableListOf()
-    @Input override var samples: List<String> = emptyList()
-    @Input override var includes: List<String> = emptyList()
-    @Input override var includeNonPublic: Boolean = false
-    @Input override var includeRootPackage: Boolean = false
-    @Input override var reportUndocumented: Boolean = false
-    @Input override var skipEmptyPackages: Boolean = false
-    @Input override var skipDeprecated: Boolean = false
-    @Input override var jdkVersion: Int = 8
-    @Input override var sourceLinks: MutableList<SourceLinkDefinition> = mutableListOf()
-    @Input override var perPackageOptions: MutableList<PackageOptions> = mutableListOf()
-    @Input override var externalDocumentationLinks: MutableList<ExternalDocumentationLink> = mutableListOf()
-    @Input @Optional override var languageVersion: String? = null
-    @Input @Optional override var apiVersion: String? = null
-    @Input override var noStdlibLink: Boolean = false
-    @Input override var noJdkLink: Boolean = false
-    @Input var noAndroidSdkLink: Boolean = false
-    @Input override var suppressedFiles: List<String> = emptyList()
-    @Input override var collectInheritedExtensionsFromLibraries: Boolean = false
-    @Input override var analysisPlatform: Platform = Platform.DEFAULT
-    @Input @Optional var platform: String? = null
-    @Input override var targets: List<String> = emptyList()
-    @Input @Optional override var sinceKotlin: String? = null
-    @Transient var collectKotlinTasks: (() -> List<Any?>?)? = null
+    @Input @Optional override var   classpath: List<String> = emptyList()
+    @Input override var             moduleName: String = ""
+    @Input override var             sourceRoots: MutableList<SourceRoot> = mutableListOf()
+    @Input override var             samples: List<String> = emptyList()
+    @Input override var             includes: List<String> = emptyList()
+    @Input override var             includeNonPublic: Boolean = false
+    @Input override var             includeRootPackage: Boolean = false
+    @Input override var             reportUndocumented: Boolean = false
+    @Input override var             skipEmptyPackages: Boolean = false
+    @Input override var             skipDeprecated: Boolean = false
+    @Input override var             jdkVersion: Int = 8
+    @Input override var             sourceLinks: MutableList<SourceLinkDefinition> = mutableListOf()
+    @Input override var             perPackageOptions: MutableList<PackageOptions> = mutableListOf()
+    @Input override var             externalDocumentationLinks: MutableList<ExternalDocumentationLink> = mutableListOf()
+    @Input @Optional override var   languageVersion: String? = null
+    @Input @Optional override var   apiVersion: String? = null
+    @Input override var             noStdlibLink: Boolean = false
+    @Input override var             noJdkLink: Boolean = false
+    @Input var                      noAndroidSdkLink: Boolean = false
+    @Input override var             suppressedFiles: List<String> = emptyList()
+    @Input override var             collectInheritedExtensionsFromLibraries: Boolean = false
+    @Input override var             analysisPlatform: Platform = Platform.DEFAULT
+    @Input @Optional var            platform: String? = null
+    @Input override var             targets: List<String> = emptyList()
+    @Input @Optional override var   sinceKotlin: String? = null
+    @Transient var                  collectKotlinTasks: (() -> List<Any?>?)? = null
     @Input @Optional @Transient var androidVariant: String? = null
+    override var                    documentationFile: String? = null
 
     fun kotlinTasks(taskSupplier: Callable<List<Any>>) {
         collectKotlinTasks = { taskSupplier.call() }
@@ -125,6 +127,7 @@ class GradleDokkaConfigurationImpl: DokkaConfiguration {
     override var impliedPlatforms: List<String> = emptyList()
     override var passesConfigurations: List<GradlePassConfigurationImpl> = emptyList()
     override var pluginsClasspath: List<File> = emptyList()
+    override var descriptors: List<GradleDokkaModuleDescriptor> = emptyList()
 }
 
 class GradlePackageOptionsImpl: PackageOptions, Serializable {
@@ -133,6 +136,12 @@ class GradlePackageOptionsImpl: PackageOptions, Serializable {
     override var reportUndocumented: Boolean = true
     override var skipDeprecated: Boolean = true
     override var suppress: Boolean = false
+}
+
+class GradleDokkaModuleDescriptor: DokkaModuleDescriptor, Serializable {
+    override var name: String = ""
+    override var path: String = ""
+    override var docFile: String = ""
 }
 
 fun GradlePassConfigurationImpl.copy(): GradlePassConfigurationImpl {

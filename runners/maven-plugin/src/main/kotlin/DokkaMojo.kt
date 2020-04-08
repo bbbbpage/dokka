@@ -230,7 +230,8 @@ abstract class AbstractDokkaMojo : AbstractMojo() {
             analysisPlatform = if (platform.isNotEmpty()) Platform.fromString(platform) else Platform.DEFAULT,
             targets = targets,
             includeNonPublic = includeNonPublic,
-            includeRootPackage = includeRootPackage
+            includeRootPackage = includeRootPackage,
+            documentationFile = null
         ).let{
             it.copy(
                 externalDocumentationLinks = defaultLinks(it) + it.externalDocumentationLinks

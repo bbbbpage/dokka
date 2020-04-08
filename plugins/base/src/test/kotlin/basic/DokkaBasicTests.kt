@@ -2,9 +2,10 @@ package basic
 
 import org.jetbrains.dokka.pages.ClasslikePageNode
 import org.jetbrains.dokka.pages.ModulePageNode
+import org.jetbrains.dokka.testApi.testRunner.AbstractCoreTest
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.jetbrains.dokka.testApi.testRunner.AbstractCoreTest
+import utils.testIfInstance
 
 class DokkaBasicTests : AbstractCoreTest() {
 
@@ -30,9 +31,12 @@ class DokkaBasicTests : AbstractCoreTest() {
         """.trimMargin(),
             configuration
         ) {
-            pagesGenerationStage = {
+            pagesGenerationStage = testIfInstance<ModulePageNode, Unit> {
                 println(it.dri)
-                assertTrue(it.getClasslikeToMemberMap().filterKeys { it.name == "Test" }.entries.firstOrNull()?.value?.size == 2)
+                assertTrue(
+                    it.getClasslikeToMemberMap()
+                        .filterKeys { it.name == "Test" }.entries.firstOrNull()?.value?.size == 2
+                )
             }
         }
     }

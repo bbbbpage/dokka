@@ -78,7 +78,8 @@ open class DokkaTask : DefaultTask() {
     var config: GradleDokkaConfigurationImpl? = null
 
     // Configure Dokka with closure in Gradle Kotlin DSL
-    fun configuration(action: Action<in GradlePassConfigurationImpl>) = action.execute(configuration)
+    fun configuration(action: Action<in GradlePassConfigurationImpl>) =
+        action.execute(configuration)
 
     private val kotlinTasks: List<Task> by lazy { extractKotlinCompileTasks(configuration.collectKotlinTasks ?: { defaultKotlinTasks() }) }
 

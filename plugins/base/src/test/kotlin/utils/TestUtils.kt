@@ -2,6 +2,7 @@ package utils
 
 import org.jetbrains.dokka.model.*
 import org.jetbrains.dokka.model.doc.*
+import org.jetbrains.dokka.pages.PageNode
 import org.jetbrains.dokka.testApi.testRunner.AbstractCoreTest
 import org.junit.jupiter.api.Assertions.assertTrue
 import kotlin.collections.orEmpty
@@ -23,9 +24,10 @@ interface AssertDSL {
     infix fun Any?.equals(other: Any?) = this.assertEqual(other)
     infix fun Collection<Any>?.allEquals(other: Any?) =
         this?.also { c -> c.forEach { it equals other } } ?: run { assert(false) { "Collection is empty" } }
+
     infix fun <T> Collection<T>?.exists(e: T) {
         assertTrue(this.orEmpty().isNotEmpty(), "Collection cannot be null or empty")
-        assertTrue(this!!.any{it == e}, "Collection doesn't contain $e")
+        assertTrue(this!!.any { it == e }, "Collection doesn't contain $e")
     }
 
     infix fun <T> Collection<T>?.counts(n: Int) = this.orEmpty().assertCount(n)
@@ -42,6 +44,12 @@ interface AssertDSL {
 
 inline fun <reified T : Any> Any?.assertIsInstance(name: String): T =
     this.let { it as? T } ?: throw AssertionError("$name should not be null")
+
+inline fun <reified T1 : PageNode, T2 : Any?> testIfInstance(noinline block: (T1) -> T2) = { it: Any? ->
+    if (it is T1) block(it)
+     else throw AssertionError("it must be ${T1::class.qualifiedName}")
+}
+
 
 fun List<DocumentationNode>.commentsToString(): String =
     this.flatMap { it.children }.joinToString(separator = "\n") { it.root.docTagSummary() }

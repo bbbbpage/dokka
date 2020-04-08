@@ -52,8 +52,10 @@ open class GlobalArguments(parser: DokkaArgumentsParser) : DokkaConfiguration {
         listOf("-pass"),
         "Single dokka pass"
     ) {
-        Arguments(parser).also { if(it.moduleName.isEmpty()) DokkaConsoleLogger.warn("Not specified module name. It can result in unexpected behaviour while including documentation for module") }
+        Arguments(parser).also { if (it.moduleName.isEmpty()) DokkaConsoleLogger.warn("Not specified module name. It can result in unexpected behaviour while including documentation for module") }
     }
+
+    override val descriptors: List<DokkaModuleDescriptor> = emptyList()
 }
 
 class Arguments(val parser: DokkaArgumentsParser) : DokkaConfiguration.PassConfiguration {
@@ -189,21 +191,27 @@ class Arguments(val parser: DokkaArgumentsParser) : DokkaConfiguration.PassConfi
             throw IllegalArgumentException("Warning: Invalid -srcLink syntax. Expected: <path>=<url>[#lineSuffix]. No source links will be generated.")
         }
     }
+
+        override val documentationFile: String? = null
+//    override val documentationFile: String? by parser.repeatableOption(
+//        listOf("-docFile"),
+//        "Module documentation"
+//    ) { it.takeUnless { it.isEmpty() } }
 }
 
 object MainKt {
     fun defaultLinks(config: DokkaConfiguration.PassConfiguration): MutableList<ExternalDocumentationLink> =
         mutableListOf<ExternalDocumentationLink>().apply {
-        if (!config.noJdkLink)
-            this += DokkaConfiguration.ExternalDocumentationLink
-                .Builder("https://docs.oracle.com/javase/${config.jdkVersion}/docs/api/")
-                .build()
+            if (!config.noJdkLink)
+                this += DokkaConfiguration.ExternalDocumentationLink
+                    .Builder("https://docs.oracle.com/javase/${config.jdkVersion}/docs/api/")
+                    .build()
 
-        if (!config.noStdlibLink)
-            this += DokkaConfiguration.ExternalDocumentationLink
-                .Builder("https://kotlinlang.org/api/latest/jvm/stdlib/")
-                .build()
-    }
+            if (!config.noStdlibLink)
+                this += DokkaConfiguration.ExternalDocumentationLink
+                    .Builder("https://kotlinlang.org/api/latest/jvm/stdlib/")
+                    .build()
+        }
 
     fun parseLinks(links: String): List<ExternalDocumentationLink> {
         val (parsedLinks, parsedOfflineLinks) = links.split("^^")

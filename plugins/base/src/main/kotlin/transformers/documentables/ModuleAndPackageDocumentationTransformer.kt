@@ -1,6 +1,6 @@
 package org.jetbrains.dokka.base.transformers.documentables
 
-import org.jetbrains.dokka.model.DModule
+import org.jetbrains.dokka.model.DPass
 import org.jetbrains.dokka.model.PlatformDependent
 import org.jetbrains.dokka.parsers.MarkdownParser
 import org.jetbrains.dokka.plugability.DokkaContext
@@ -12,7 +12,7 @@ import java.nio.file.Paths
 
 internal object ModuleAndPackageDocumentationTransformer : PreMergeDocumentableTransformer {
 
-    override fun invoke(original: List<DModule>, context: DokkaContext): List<DModule> {
+    override fun invoke(original: List<DPass>, context: DokkaContext): List<DPass> {
 
         val modulesAndPackagesDocumentation =
             context.configuration.passesConfigurations
