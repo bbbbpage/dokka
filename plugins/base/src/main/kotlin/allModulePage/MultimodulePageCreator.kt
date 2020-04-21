@@ -6,15 +6,19 @@ import org.jetbrains.dokka.EnvironmentAndFacade
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.translators.documentables.PageContentBuilder
 import org.jetbrains.dokka.links.DRI
+import org.jetbrains.dokka.model.Documentable
+import org.jetbrains.dokka.model.PlatformDependent
 import org.jetbrains.dokka.model.doc.DocumentationNode
 import org.jetbrains.dokka.model.doc.P
 import org.jetbrains.dokka.pages.ContentKind
 import org.jetbrains.dokka.pages.PlatformData
 import org.jetbrains.dokka.pages.RootPageNode
+import org.jetbrains.dokka.pages.TextStyle
 import org.jetbrains.dokka.parsers.MarkdownParser
 import org.jetbrains.dokka.plugability.DokkaContext
 import org.jetbrains.dokka.plugability.querySingle
 import org.jetbrains.dokka.transformers.pages.PageCreator
+import org.jetbrains.dokka.utilities.DokkaConsoleLogger
 import org.jetbrains.dokka.utilities.DokkaLogger
 import java.io.File
 
@@ -34,9 +38,10 @@ class MultimodulePageCreator(
                 }
         }
         val moduleDoc =
-            modules.firstOrNull()?.let { File(it.path).parentFile.parentFile.resolve(File(it.docFile).name) }?.let {
-                parser.parse(it.readText())
-            }.firstParagraph()
+            modules.firstOrNull()?.let { File(it.path).parentFile.parentFile.resolve(File(it.docFile).name) }
+                ?.takeIf { it.exists() }?.let {
+                    parser.parse(it.readText())
+                }.firstParagraph()
 
         val commentsConverter = context.plugin(DokkaBase::class)?.querySingle { commentsToContentConverter }
         val signatureProvider = context.plugin(DokkaBase::class)?.querySingle { signatureProvider }
@@ -45,11 +50,31 @@ class MultimodulePageCreator(
 
         val platformDatas = configuration.passesConfigurations.map { it.platformData }.toSet()
         val builder = PageContentBuilder(commentsConverter, signatureProvider, context.logger)
+        val dummyDoc = object : Documentable() {
+            override val name: String? = null
+            override val dri: DRI = DRI.topLevel
+            override val children: List<Documentable> = emptyList()
+            override val documentation: PlatformDependent<DocumentationNode> = PlatformDependent.empty()
+            override val platformData: List<PlatformData> = emptyList()
+        }
 
         return MultimoduleRootPageNode("Modules", submodulesWithDocs, setOf(DRI(packageName = "ext")), builder) {
             builder.contentFor(dri = DRI("ext"), platformData = platformDatas, kind = ContentKind.Cover) {
+                text("Test", styles = setOf(TextStyle.Paragraph), platformData = platformDatas)
+
+                buildGroup(dri = DRI.topLevel, styles = setOf(TextStyle.Paragraph), platformData = platformDatas) {
+                    text("Test2")
+                }
+                group(dri = DRI.topLevel, styles = setOf(TextStyle.Paragraph), platformData = platformDatas) {
+                    text("Test3")
+                }
+                if (moduleDoc.isNotEmpty()) {
+                    group(styles = setOf(TextStyle.Paragraph), platformData = platformDatas) {
+                        text("Top level documentation: ")
+                        text(moduleDoc)
+                    }
+                }
                 text("All modules:")
-                if (moduleDoc.isNotEmpty()) text(moduleDoc)
                 table(DRI("ext"), platformData = platformDatas) {
                     links.map { (dri, doc) ->
                         buildGroup {
